@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+#coding: utf-8
+
 import rospy
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import LaserScan #LaserScanメッセージをインポート
@@ -24,7 +26,7 @@ def callback(msg):
 def main():
     rospy.init_node("vel_pub")
     pub = rospy.Publisher("cmd_vel", Twist, queue_size=10)
-    sub = rospy.Subscriber(“scan”, LaserScan, callback)  #Subscriberを宣言
+    sub = rospy.Subscriber("scan", LaserScan, callback)  #Subscriberを宣言
     rate = rospy.Rate(10)
     for i in range(100):
         msg = Twist()
