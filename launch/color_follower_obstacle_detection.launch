@@ -1,0 +1,17 @@
+<launch>
+
+    <!-- roslaunch limo_bringup limo_start.launch -->
+    <include file="$(find limo_bringup)/launch/limo_start.launch"/>
+
+    <!-- roslaunch astra_camera dabai_u3.launch-->
+    <include file="$(find astra_camera)/launch/dabai_u3.launch"/>
+
+    <!-- rosrun limo_traininig obstacle_detection.py -->
+    <node name="obstacle_detector" type="obstacle_detector.py" pkg="limo_training" output="screen"/>
+
+    <!-- rosrun limo_training color_follower.py  -->
+    <node name="color_follower" type="color_follower.py" pkg="limo_training" output="screen">
+        <remap from="cmd_vel" to="cmd_vel_orig"/>
+    </node>
+
+</launch>
