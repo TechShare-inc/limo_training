@@ -14,6 +14,7 @@ class ColorFollower:
 		self.pub = rospy.Publisher("cmd_vel", Twist, queue_size=10)
 		self.sub = rospy.Subscriber("camera/rgb/image_raw", Image, self.callback)
 		self.bridge = cv_bridge.CvBridge()
+		self.Kp = 0.002
 		cv.namedWindow('BGR Image', 1)	#'BGR Image'という名前の画像表示のウィンドウを作成
 		cv.namedWindow('MASK', 1)	#'MASK'という名前の画像表示のウィンドウを作成
 		
@@ -24,8 +25,8 @@ class ColorFollower:
 		h, w = image.shape[:2]
 		RESIZE = (w//2, h//2)
 		hsv = cv.cvtColor(image, cv.COLOR_BGR2HSV)
-		lower_hsv = np.array([95, 10, 10])		#フィルタの閾値（下限）
-		upper_hsv = np.array([130, 255, 250])	#フィルタの閾値（上限）
+		lower_hsv = np.array([35, 30, 10])		#フィルタの閾値（下限）
+		upper_hsv = np.array([55, 255, 250])	#フィルタの閾値（上限）
 		mask = cv.inRange(hsv, lower_hsv, upper_hsv)	#閾値による二値化画像の生成（フィルタ範囲内のピクセルは1として扱われる）
 		area_top = h - 10
 		area_bot = h				#検出範囲を画像の下から10pxに絞る
@@ -40,7 +41,7 @@ class ColorFollower:
 			cv.circle(image, (gp_x, gp_y), 10, (0, 0, 255), -1)	#重心をBGR画像に表示
 			err = gp_x - w//2		#ライン領域の重心の中心からのずれ
 			cmd_vel.linear.x = 0.1	
-			cmd_vel.angular.z = -float(err)/500	#ずれに応じて旋回速度を変化させる
+			cmd_vel.angular.z = -self.Kp * float(err)	#ずれに応じて旋回速度を変化させる
 			self.pub.publish(cmd_vel)
 
 		display_image = cv.resize(image, RESIZE)
